@@ -20,6 +20,7 @@ typedef struct person{
 	char name [MAXREG];
 	int age;
 	double rate;
+	person_t* next;
 	
 }person_t;
 
