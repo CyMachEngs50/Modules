@@ -21,18 +21,17 @@ typedef struct person {
 	double rate;
 } person_t;
 
-bool matches_key(person_t *p, const char* keyp[MAXREG]){
-  if (strcmp(p->name,  keyp)==0){                                                
-    return true;                                                                                                                
+bool matches_key(person_t *p, const char keyp[MAXREG]){
+  if (strcmp(p->name, keyp)==0){                                                
+    return true;                                                                             
   }
-	
+}
 person_t* make_person(char* namep, int agep, double ratep){
 	person_t *pp;
 	if (!(pp=malloc(sizeof(person_t)))){                        
     printf("[Error : no memory was allocated to list of cars pointer]\n");                      
     return NULL;
 	}
-	pp->next = NULL;
 	strcpy(pp->name, namep);
 	pp->age=agep;
 	pp->rate=ratep;
@@ -46,4 +45,5 @@ int main (void){
 	pp=make_person("Greg", 21, 20.0);
 	qput(qp,(void*)pp);
 	pp=(person_t*)qget(qp);
+	qclose(qp);
 }
