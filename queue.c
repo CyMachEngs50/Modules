@@ -1,23 +1,3 @@
-/* queue.c --- 
- * 
- * 
- * Author: Gregory Macharia
- * Created: Tue Oct 15 10:36:17 2019 (-0400)
- * Version: 
- * 
- * Description: 
- * 
- */
-/* queue.c --- 
- * 
- * 
- * Author: Gregory Macharia
- * Created: Tue Oct 15 10:35:58 2019 (-0400)
- * Version: 
- * 
- * Description: 
- * 
- */
 /* queue.c --- a module that implements a generic queue 
  * 
  * 
