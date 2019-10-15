@@ -10,62 +10,90 @@
  */
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-typedef void queue{
-	void* front;
-	void* back;
+typedef struct iqueue_t{
+	node_t *front;
+	node_t *back;
 	int size;
-}queue_t;
+}iqueue_t;
 
 
-/* create an empty queue */
-queue_t* qopen(void){
- if (!(cp=malloc(sizeof(car_t)))){                                             
+typedef struct node_t{
+	struct node_t *next;
+	void* data;
+}node_t;
+
+
+static node_t* create_node(void){
+	node_t *np;	
+	if (!(np=(node_t*)malloc(sizeof(node_t)))){                                             
     printf("[Error : no memory was allocated to list of cars pointer]\n");  
     return NULL;                                                             
   }
- queue_t *qp;
+ np->next=NULL;
+ qp->data=NULL;
+ return np;
+}
+
+/* create an empty queue */
+queue_t* qopen(void){
+	iqueue_t *qp;	
+	if (!(qp=(iqueue_t*)malloc(sizeof(iqueue_t)))){                                             
+    printf("[Error : no memory was allocated to list of cars pointer]\n");  
+    return NULL;                                                             
+  }
  qp->front=NULL;
  qp->back=NULL;
  qp->size=0;
- return qp;
+ return (queue_t*)qp;
 }
 
 /* deallocate a queue. frees everything in it */
 void qclose(queue_t *qp){
-
+  node_t *p;                                                                                                   
+  for (p=qp->front; p!=NULL; p=p->next){
+		free p->data
+    free p; 
+	}
+	free qp;
 }
 
 /* put element at the end of the queue
  *returns 0 if successfull; non zero if otherwise
  */
 int32_t qput(queue_t *qp, void *elementp){
-	if (qp->size=0){
-	qp->front=elementp;
-	qp->back=elementp;
+	node_t *np=create_node();
+	np->data=elementp;
+	if (qp->size=0){ 
+		qp->front=np;
+		qp->back=np;		
 	}
 	else{
-		qp->back->next=elementp;
-		qp->back=elementp;
-		qp->size+= 1;
+		qp->back->next=np;
+		qp->back=np;
 	}
+	qp->size+= 1;  
 }
 
 /* get the first first element from queue, removing it from the queue */
 void* qget(queue_t *qp){
-	void* tempfront=qp->front;
-	qp->front=front->next;
-	tempfront->next=NULL;
-	qp->size -=1;
-	return tempfront;
+	if (qp->size >0){
+		node_t *tempfront=qp->front;
+		qp->front=front->next;
+		tempfront->next=NULL;
+		qp->size -=1;
+		return tempfront;
+	}
+	else{
+		printf("Cannot get from an empty queue!\n");
 }
 
 /* apply a function to every element of the queue */
 void* qapply(queue_t *qp, void (*fn)(void* elementp)){
-	void* p;
-	
-  for (p=qp->front; p!=NULL; p=p->next){                                                                       
-    fn(p);
+	node *np;
+  for (np=qp->front; np!=NULL; np=np->next){                                                                
+    fn(np->data);
 	}
 }
 
@@ -79,7 +107,14 @@ void* qapply(queue_t *qp, void (*fn)(void* elementp)){
  * returns a pointer to an element, or NULL if not found                                        
  */
 void* qsearch(queue_t *qp, bool (*searchfn)(void* elementp, const void* keyp), const void* skeyp){
-
+	node_t *np;
+	for (np=front; np!=NULL; np=np->next){
+		elementp=np->data;
+		if(searchfn(elementp, skeyp)==true){
+			return elementp;
+		}
+	}
+	return NULL;
 }
 
 /* search a queue using a supplied boolean function (as in qsearch),                            
@@ -88,7 +123,41 @@ void* qsearch(queue_t *qp, bool (*searchfn)(void* elementp, const void* keyp), c
  */
 
 void* qremove(queue_t *qp, bool (*searchfn)(void* elementp, const void* keyp), const void* skeyp){
-
+	node_t *prevp;
+	node_t *np;
+	prevp=qp->front;
+	if (qp->size == 0){
+		printf("Cannot remove from an empty list!n\ ");
+		exit(EXIT_FAILURE);
+	}
+	if (qp->size == 1){
+		if(searchfn(elementp, skeyp)==true){ 
+			qp->front = NULL;                                                                                                  
+			qp->back = NULL;                                                                                              
+			qp->size -= 1;
+			return elementp;
+		}
+	}
+	else{
+		prevp=qp->front;
+		if(searchfn(qp->front->data, skeyp)==true){
+			node_t *tempfront=qp->front;                                                                                   
+			qp->front=front->next;                                                                                               
+			tempfront->next=NULL;                                                                       
+			qp->size -= 1;
+			return tempfront;
+		}
+		for (np=front->next; np!=NULL; np=np->next){
+			if(searchfn(np->data, skeyp)==true){
+			  prevp->next=np->next;
+				np->next=NULL;
+				qp->size -= 1;			 
+				return np->data;                                                                                                 
+			}                                                                                                                     
+			prevp=np; 
+		}
+	}
+ 	return NULL;
 }
 
 /* concatenatenates elements of q2 into q1                                                      
