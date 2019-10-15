@@ -1,7 +1,8 @@
+
 /* queue.c --- a module that implements a generic queue 
  * 
  * 
- * Author: Gregory Macharia
+ * Author: Gregory Macharia and Cynthia Jeruto
  * Created: Sun Oct 13 17:02:59 2019 (-0400)
  * Version: 
  * 
