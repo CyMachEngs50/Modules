@@ -70,15 +70,15 @@ queue_t* qopen(void){
 
 /* deallocate a queue. frees everything in it */
 void qclose(queue_t *qp){
-  node_t *p;
-  for (p=qp->front; p!=NULL; p=p->next){
-		/*free (p->data);
-			p-> data=NULL;*/
-    free (p);
-		p=NULL;
-	}
-	free (qp);
-	qp=NULL;
+  node_t *p=qp->front;
+	node_t *s=NULL;
+	while (p!=NULL){
+		s=p->next;
+		free(p->data);
+    free(p);
+		p=s;
+	} 
+	free(qp);
 	
 }
 
@@ -86,38 +86,44 @@ void qclose(queue_t *qp){
  *returns 0 if successfull; non zero if otherwise
  */
 int32_t qput(queue_t *qp, void *elementp){
-	node_t *np=create_node();
+	int32_t i=1;	 
+	node_t *np=create_node(); 
 	np->data=elementp;
-	if (qp->size=0){ 
+	if (qp->size==0){
 		qp->front=np;
-		qp->back=np;		
+		qp->back=np;
+		i=0;
 	}
 	else{
 		qp->back->next=np;
 		qp->back=np;
+		i=0;
 	}
-	qp->size+= 1;  
+	qp->size+= 1;
+	return i;
 }
 
 /* get the first first element from queue, removing it from the queue */
 void* qget(queue_t *qp){
 	if (qp->size >0){
 		node_t *tempfront=qp->front;
-		qp->front=qp->front->next;
-		tempfront->next=NULL;
+ 		qp->front=qp->front->next;
+	  tempfront->next=NULL;
 		qp->size -=1;
-		return tempfront;
+		printf("returned first in!\n"); 
+		return tempfront->data;
 	}
 	else{
 		printf("Cannot get from an empty queue!\n");
+		return NULL;
 	}
 }
 
 /* apply a function to every element of the queue */
 void* qapply(queue_t *qp, void (*fn)(void* elementp)){
 	node_t *np;
-  for (np=qp->front; np!=NULL; np=np->next){                                                                
-    fn(np->data);
+  for (np=qp->front; np!=NULL; np=np->next){
+		fn(np->data);
 	}
 }
 
@@ -134,9 +140,11 @@ void* qsearch(queue_t *qp, bool (*searchfn)(void* elementp, const void* keyp), c
 	node_t *np;
 	for (np=qp->front; np!=NULL; np=np->next){
 			if(searchfn(np->data, skeyp)==true){
+				printf("found!\n");
 				return np->data;
 		}
 	}
+	printf("Not found!\n");
 	return NULL;
 }
 
@@ -150,37 +158,41 @@ void* qremove(queue_t *qp, bool (*searchfn)(void* elementp, const void* keyp), c
 	node_t *np;
 	prevp=qp->front;
 	if (qp->size == 0){
-		printf("Cannot remove from an empty list!\n ");
-		exit(EXIT_FAILURE);
+		printf("Cannot remove from an empty list!\n");
+		return NULL;
 	}
 	if (qp->size == 1){
 		if(searchfn(qp->front->data, skeyp)==true){
 			node_t *tempfront=qp->front;
-			qp->front = NULL;                                                                                                  
-			qp->back = NULL;                                                                                              
+			qp->front = NULL;                                                                                            
+			qp->back = NULL;                                                                                             
 			qp->size -= 1;
+			printf("queue is now empty!\n"); 
 			return tempfront->data;
 		}
 	}
 	else{
 		prevp=qp->front;
 		if(searchfn(qp->front->data, skeyp)==true){
-			node_t *tempfront=qp->front;                                                                                   
-			qp->front=qp->front->next;                                                                                               
+			node_t *tempfront=qp->front;                                                                                
+			qp->front=qp->front->next;                                      
 			tempfront->next=NULL;                                                                       
 			qp->size -= 1;
+			printf("Removed at front!\n");
 			return tempfront->data;
 		}
 		for (np=qp->front->next; np!=NULL; np=np->next){
 			if(searchfn(np->data, skeyp)==true){
 			  prevp->next=np->next;
 				np->next=NULL;
-				qp->size -= 1;			 
-				return np->data;                                                                                                 
-			}                                                                                                                     
+				qp->size -= 1;
+				printf("Removed at middle!\n"); 
+				return np->data;                                                                                           
+			}                                                                                                         
 			prevp=np; 
 		}
 	}
+	printf("Cannot remove: Nothing matched the key!\n"); 
  	return NULL;
 }
 

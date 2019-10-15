@@ -21,10 +21,11 @@ typedef struct person {
 	double rate;
 } person_t;
 
-bool matches_key(person_t *p, const char keyp[MAXREG]){
+bool search(person_t *p, const char keyp[MAXREG]){
   if (strcmp(p->name, keyp)==0){                                                
     return true;                                                                             
   }
+	else return false;
 }
 person_t* make_person(char* namep, int agep, double ratep){
 	person_t *pp;
@@ -40,10 +41,19 @@ person_t* make_person(char* namep, int agep, double ratep){
 
 int main (void){
 	queue_t *qp;
-	person_t *pp;
+	person_t *p1,*p2,*p3,*p4,*p5;
+  bool (*fn)(void* elementp, const void* keyp);
+	fn= search;
+	p1=make_person("Greg", 21, 20.0);
+	p2=make_person("Bob", 21, 20.0);
+	
 	qp=qopen();
-	pp=make_person("Greg", 21, 20.0);
-	qput(qp,(void*)pp);
-	pp=(person_t*)qget(qp);
+	p3=(person_t*)qget(qp);
+	p3=(person_t*)qremove(qp, fn, "Greg");
+	qput(qp,(void*)p1);
+	qput(qp,(void*)p2);
+	p5=(person_t*)qsearch(qp, fn, "Bob");
+	p4=(person_t*)qremove(qp, fn, "Greg");
+	p1=(person_t*)qget(qp);
 	qclose(qp);
 }
