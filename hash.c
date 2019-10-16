@@ -1,12 +1,15 @@
-/* 
+/*
  * hash.c -- implements a generic hash table as an indexed set of queues.
  *
  */
 #include <stdint.h>
-
-/* 
+#include <stdio.h>
+#include "hash.h"
+#include <stdlib.h>
+#include "queue.h"
+/*
  * SuperFastHash() -- produces a number between 0 and the tablesize-1.
- * 
+ *
  * The following (rather complicated) code, has been taken from Paul
  * Hsieh's website under the terms of the BSD license. It's a hash
  * function used all over the place nowadays, including Google Sparse
@@ -17,7 +20,7 @@
 static uint32_t SuperFastHash (const char *data,int len,uint32_t tablesize) {
   uint32_t hash = len, tmp;
   int rem;
-  
+
   if (len <= 0 || data == NULL)
 		return 0;
   rem = len & 3;
@@ -55,3 +58,101 @@ static uint32_t SuperFastHash (const char *data,int len,uint32_t tablesize) {
   return hash % tablesize;
 }
 
+//function to use in happly
+
+static void(my_func(person_t* p1)){
+p1->age = 2*p1->age;
+
+
+}
+//opening a hash table with initial size hsize
+hashtable_t *hopen(uint32_t hsize){
+    hashtable_t *htp;
+    if(!(htp=malloc(sizeof(hashtable_t)))){
+    printf("[Error:no memory was allocated to the table\n");
+    return NULL;
+    }
+    hsize=0;
+	return htp;
+
+}
+
+
+
+
+///* hclose -- closes a hash table */
+  void hclose(hashtable_t *htp){                                                                                void hclose(hashtable_t *htp){
+	free (htp);
+
+//	free(htp);
+//	htp = NULL;
+
+}
+
+
+//
+///* hput -- puts an entry into a hash table under designated key                 * returns 0 for success; non-zero otherwise                                    */
+int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
+    if (htp != NULL && key != NULL && ep != NULL){
+    //geeting the hash index
+        int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
+
+        if(hash_index == NULL){
+        //how to create a new hash index........??????????????????????????????
+            hash_index = qput();
+        }
+    int value;
+	//	return index
+	return value; //0 if successfull
+}
+}}
+/* happly -- applies a function to every entry in hash table */
+void happly(hashtable_t *htp, void (*fn)(void* ep)){
+    if (htp != NULL && my_func != NULL){
+        for(int i = 0; i < hsize; i++){
+          //DO SOME FUNCTION
+            my_func(i);
+
+        }
+    }
+
+   /* hsearch -- searchs for an entry under a designated key using a
+ * designated search fn -- returns a pointer to the entry or NULL if
+ * not found
+ */
+void *hsearch(hashtable_t *htp,
+	      bool (*searchfn)(void* elementp, const void* searchkeyp),
+	      const char *key,
+	      int32_t keylen){
+
+    if ( htp == NULL){
+        return NULL;
+    }
+     else{
+     for (int i=0; i < hsize; i++){
+        qsearch(&my_search_func, int i);
+     }
+     }
+}
+/* hremove -- removes and returns an entry under a designated key
+ * using a designated search fn -- returns a pointer to the entry or
+ * NULL if not found
+ */
+void *hremove(hashtable_t *htp,
+	      bool (*searchfn)(void* elementp, const void* searchkeyp),
+	      const char *key,
+	      int32_t keylen){
+        for (int i=0; i < htp-> hsize; i++){
+	      qremove (&my_search_fn, int i);
+}
+}
+
+
+
+
+
+
+
+}
+
+////
