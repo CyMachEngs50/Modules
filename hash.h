@@ -6,11 +6,33 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
+#define MAXNM 80
+#define MAXREG 10
 
-typedef void hashtable_t;	/* representation of a hashtable hidden */
+typedef struct person{
+    struct person *next;
+    char name[MAXNM];
+    int age;
+    double rate;
+} person_t;
+
+
+typedef struct kvnode_t {
+  struct queue_t *q;
+  struct kvnode_t *down;
+  uint32_t key;
+} kvnode_t;
+
+typedef struct hashtable_t{
+	kvnode_t *first;
+	int hsize;
+} hashtable_t;
+
+//typedef void hashtable_t;	/* representation of a hashtable hidden */
 
 /* hopen -- opens a hash table with initial size hsize */
 hashtable_t *hopen(uint32_t hsize);
+
 
 /* hclose -- closes a hash table */
 void hclose(hashtable_t *htp);

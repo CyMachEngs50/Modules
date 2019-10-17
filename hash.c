@@ -58,13 +58,24 @@ static uint32_t SuperFastHash (const char *data,int len,uint32_t tablesize) {
   return hash % tablesize;
 }
 
+static kvnode_t* create_hnode(void){
+	kvnode_t *kv;
+	if (!(kv=(kvnode_t*)malloc(sizeof(kvnode_t)))){
+    printf("[Error : no memory was allocated to list of cars pointer]\n");
+    return NULL;
+  }
+ kv->q=NULL;
+ kv->key=NULL;
+ kv->down=NULL;
+ return kv;
+}
+
 //function to use in happly
 
-static void(my_func(person_t* p1)){
-p1->age = 2*p1->age;
-
-
-}
+//static void my_func(person_t* p1){
+//    p1->age = 2*p1->age;
+//
+//}
 //opening a hash table with initial size hsize
 hashtable_t *hopen(uint32_t hsize){
     hashtable_t *htp;
@@ -72,16 +83,14 @@ hashtable_t *hopen(uint32_t hsize){
     printf("[Error:no memory was allocated to the table\n");
     return NULL;
     }
-    hsize=0;
+    htp->hsize=hsize;
+    htp->first=NULL;
 	return htp;
 
 }
 
-
-
-
 ///* hclose -- closes a hash table */
-  void hclose(hashtable_t *htp){                                                                                void hclose(hashtable_t *htp){
+  void hclose(hashtable_t *htp){
 	free (htp);
 
 //	free(htp);
@@ -93,66 +102,102 @@ hashtable_t *hopen(uint32_t hsize){
 //
 ///* hput -- puts an entry into a hash table under designated key                 * returns 0 for success; non-zero otherwise                                    */
 int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
+    int value=0;
     if (htp != NULL && key != NULL && ep != NULL){
     //geeting the hash index
-        int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
-
-        if(hash_index == NULL){
-        //how to create a new hash index........??????????????????????????????
-            hash_index = qput();
+       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
+       kvnode_t *hnode=create_hnode();
+       kvnode_t *prev;
+       if (htp->first==NULL){
+            queue_t *qp = qopen();
+            qput(qp,ep);
+            hnode->q=qp;
+            hnode->key=hash_index;
+            htp->first=hnode;
+       }else{
+           for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
+                if (hnode->key==hash_index){
+                    if (hnode->q == NULL){
+                        queue_t *qp = qopen();
+                        qput(qp,ep);
+                        hnode->q=qp;
+                        hnode->key=hash_index;
+                        if (prev->key < hnode->key){
+                             prev->down=hnode;
+                            }else{
+                             hnode->down=prev;
+                            }
+                        if (htp->first->key>hnode->key){
+                           hnode->down=htp->first;
+                           htp->first=hnode;
+                        }
+                    }else{
+                      qput(hnode->q,ep);
+                    }
+                    break;
+                }
+                prev=hnode;
+            }
         }
-    int value;
-	//	return index
-	return value; //0 if successfull
 }
-}}
+return value; //0 if successfull
+}
 /* happly -- applies a function to every entry in hash table */
 void happly(hashtable_t *htp, void (*fn)(void* ep)){
-    if (htp != NULL && my_func != NULL){
-        for(int i = 0; i < hsize; i++){
-          //DO SOME FUNCTION
-            my_func(i);
-
+       printf("entered here 0");
+       kvnode_t *hnode;
+       for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
+                if (hnode->q != NULL){
+                    qapply(hnode->q,fn);
+                }
         }
+
     }
 
    /* hsearch -- searchs for an entry under a designated key using a
  * designated search fn -- returns a pointer to the entry or NULL if
  * not found
  */
-void *hsearch(hashtable_t *htp,
-	      bool (*searchfn)(void* elementp, const void* searchkeyp),
-	      const char *key,
-	      int32_t keylen){
+void *hsearch(hashtable_t *htp, bool (*searchfn)(void* elementp, const void* searchkeyp),const char *key, int32_t keylen){
 
-    if ( htp == NULL){
-        return NULL;
-    }
-     else{
-     for (int i=0; i < hsize; i++){
-        qsearch(&my_search_func, int i);
-     }
-     }
+       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
+       kvnode_t *hnode;
+       for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
+
+            if (hnode->key==hash_index){
+                if (hnode->q == NULL){
+                  printf("Element not found");
+                  return NULL;
+                }else{
+                return qsearch(hnode->q, searchfn, key);
+                }
+            }
+        }
+       printf("Found element to hashmap %d \n",hash_index);
+return NULL;
 }
 /* hremove -- removes and returns an entry under a designated key
  * using a designated search fn -- returns a pointer to the entry or
  * NULL if not found
  */
-void *hremove(hashtable_t *htp,
-	      bool (*searchfn)(void* elementp, const void* searchkeyp),
-	      const char *key,
-	      int32_t keylen){
-        for (int i=0; i < htp-> hsize; i++){
-	      qremove (&my_search_fn, int i);
+void *hremove(hashtable_t *htp,bool (*searchfn)(void* elementp, const void* searchkeyp),const char *key, int32_t keylen){
+       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
+       kvnode_t *hnode;
+       for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
+            if (hnode->key==hash_index){
+                if (hnode->q == NULL){
+                  printf("Element not found");
+                  return NULL;
+                }else{
+                person_t *person=(person_t*)qremove(hnode->q,searchfn,key);
+                  return person;
+                }
+            }
+        }
+       printf("Found element to hashmap %d \n",hash_index);
+
+return NULL;
 }
-}
 
-
-
-
-//trying to use git
-
-
-}
 
 ////
