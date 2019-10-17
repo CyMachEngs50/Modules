@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "hash.h"
-#include "queue.h"
+#include "queue.c"
 /*
  * SuperFastHash() -- produces a number between 0 and the tablesize-1.
  *
@@ -106,7 +106,7 @@ int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
     int value=0;
     if (htp != NULL && key != NULL && ep != NULL){
     //geeting the hash index
-       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
+			int32_t hash_index  = SuperFastHash ( key, keylen, htp->hsize);  //return ht%size
        kvnode_t *hnode=create_hnode();
        kvnode_t *prev;
        if (htp->first==NULL){
@@ -156,25 +156,23 @@ void happly(hashtable_t *htp, void (*fn)(void* ep)){
     }
 
    /* hsearch -- searchs for an entry under a designated key using a
- * designated search fn -- returns a pointer to the entry or NULL if
+ * designated search fn -- returns a pointer to the entry or null if
  * not found
  */
 void *hsearch(hashtable_t *htp, bool (*searchfn)(void* elementp, const void* searchkeyp),const char *key, int32_t keylen){
 
-       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
+	int32_t hash_index  = SuperFastHash ( key, keylen, htp->hsize);  //return ht%size
        kvnode_t *hnode;
        for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
-
+				 printf("louis\n");
             if (hnode->key==hash_index){
-                if (hnode->q == NULL){
-                  printf("Element not found");
-                  return NULL;
-                }else{
-                return qsearch(hnode->q, searchfn, key);
-                }
+              if (hnode->q != NULL){
+           
+									return qsearch(hnode->q, searchfn, key);
+              }  
             }
         }
-       printf("Found element to hashmap %d \n",hash_index);
+       printf("Not Found element to hashmap %d \n",hash_index);
 return NULL;
 }
 /* hremove -- removes and returns an entry under a designated key
@@ -182,7 +180,7 @@ return NULL;
  * NULL if not found
  */
 void *hremove(hashtable_t *htp,bool (*searchfn)(void* elementp, const void* searchkeyp),const char *key, int32_t keylen){
-       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
+	int32_t hash_index  = SuperFastHash (key, keylen, htp->hsize);  //return ht%size
        kvnode_t *hnode;
        for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
             if (hnode->key==hash_index){
