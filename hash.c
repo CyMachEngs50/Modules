@@ -2,10 +2,11 @@
  * hash.c -- implements a generic hash table as an indexed set of queues.
  *
  */
+
 #include <stdint.h>
 #include <stdio.h>
-#include "hash.h"
 #include <stdlib.h>
+#include "hash.h"
 #include "queue.h"
 /*
  * SuperFastHash() -- produces a number between 0 and the tablesize-1.
