@@ -3,10 +3,11 @@
  *
  */
 #include <stdint.h>
+#include "queue.c" 
 #include <stdio.h>
 #include "hash.h"
 #include <stdlib.h>
-#include "queue.h"
+#include "queue.h" 
 /*
  * SuperFastHash() -- produces a number between 0 and the tablesize-1.
  *
@@ -61,7 +62,7 @@ static uint32_t SuperFastHash (const char *data,int len,uint32_t tablesize) {
 static kvnode_t* create_hnode(void){
 	kvnode_t *kv;
 	if (!(kv=(kvnode_t*)malloc(sizeof(kvnode_t)))){
-    printf("[Error : no memory was allocated to list of cars pointer]\n");
+    printf("[Error : no memory was allocated to hash table nodes]\n");
     return NULL;
   }
  kv->q=NULL;
