@@ -23,7 +23,7 @@ int32_t qput(queue_t *qp, void *elementp);
 void* qget(queue_t *qp);
 
 /* apply a function to every element of the queue */
-void qapply(queue_t *qp, void (*fn)(void* elementp));
+void* qapply(queue_t *qp, void (*fn)(void* elementp));
 
 /* search a queue using a supplied boolean function
  * skeyp -- a key to search for
