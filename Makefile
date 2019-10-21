@@ -1,4 +1,4 @@
-CFLAGS: -Wall-pedantic-std=c11-|.-g
+CFLAGS: -Wall-pedantic-std=c11 -g -ggdb
 
 
 all:  queuetest hash_test

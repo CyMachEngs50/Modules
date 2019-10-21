@@ -58,7 +58,7 @@ int main(void){
     p7=make_person("Jerutoh",18, 50.0 );
 
     htp=hopen(10);
-    printf("executed upto here");
+    printf("executed upto here\n");
 		// happly(htp,&myfunc);
 	 
 
@@ -68,14 +68,14 @@ int main(void){
     hput(htp,(void *)p5,p5->name,mystrlen(p5->name));
     hput(htp,(void *)p6,p6->name,mystrlen(p6->name));
     hput(htp,(void *)p7,p7->name,mystrlen(p7->name));
-    printf("added all items");
+    printf("added all items\n");
 		
 		//	bool mysearch_ret = search(p2, "John");
     person=(person_t*)hsearch(htp,&search,"Louis",mystrlen("Louis"));
 		if (person != NULL){
-			printf("Name: %s, Rate: %f",person->name,person->rate);
+			printf("Name: %s, Rate: %f\n",person->name,person->rate);
 			}else{
-			printf("Person not found");
+			printf("Person not found\n");
 		}
 		//hremove(htp,&search,"John", keylen);
 		//person=(person_t*)hsearch(htp,&search,"John",keylen);

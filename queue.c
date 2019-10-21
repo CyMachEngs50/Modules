@@ -120,6 +120,7 @@ void* qapply(queue_t *qp, void (*fn)(void* elementp)){
 void* qsearch(queue_t *qp, bool (*searchfn)(void* elementp, const void* keyp), const void* skeyp){
 	node_t *np;
 	for (np=qp->front; np!=NULL; np=np->next){
+		printf("calling searchfn\n");
 			if(searchfn(np->data, skeyp)==true){
 				printf("found!\n");
 				return np->data;
