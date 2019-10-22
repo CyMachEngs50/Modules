@@ -13,18 +13,17 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "queue.h"
 
 typedef struct node_t {                                                                        
   struct node_t *next;                                                                        
   void* data;                                                                                 
 } node_t;
 
-typedef struct iqueue{
+typedef struct queue_t{
 	node_t *front;
 	node_t *back;
 	int size;
-}iqueue_t;
+}queue_t;
 
 static node_t* create_node(void){
 	node_t *np;	
@@ -39,8 +38,8 @@ static node_t* create_node(void){
 
 /* create an empty queue */
 queue_t* qopen(void){
-	iqueue_t *qp;	
-	if (!(qp=(iqueue_t*)malloc(sizeof(queue_t)))){                                             
+	queue_t *qp;	
+	if (!(qp=(queue_t*)malloc(sizeof(queue_t)))){                                             
     printf("[Error : no memory was allocated to list of cars pointer]\n");  
     return NULL;                                                             
   }
@@ -68,8 +67,7 @@ void qclose(queue_t *qp){
  *returns 0 if successfull; non zero if otherwise
  */
 int32_t qput(queue_t *qp, void *elementp){
-	int32_t i=1;
-	
+	int32_t i=1;	 
 	node_t *np=create_node(); 
 	np->data=elementp;
 	if (qp->size==0){
@@ -105,7 +103,7 @@ void* qget(queue_t *qp){
 /* apply a function to every element of the queue */
 void* qapply(queue_t *qp, void (*fn)(void* elementp)){
 	node_t *np;
-  for (np=(iqueue_t*)qp->front; np!=NULL; np=np->next){
+  for (np=qp->front; np!=NULL; np=np->next){
 		fn(np->data);
 	}
 }

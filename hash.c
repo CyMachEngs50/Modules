@@ -4,15 +4,25 @@
  */
 
 #include <stdint.h>
-#include "queue.c" 
 #include <stdio.h>
 #include <stdlib.h>
-<<<<<<< HEAD
-#include "queue.h" 
-=======
+#include <stdbool.h>
 #include "hash.h"
-#include "queue.h"
->>>>>>> 1ecf4862deb83fe32c0941953943ac1971621851
+#include "queue.c"
+
+#define MAXNM 80                                                                                     
+#define MAXREG 10   
+
+typedef struct hnode_t {                                                                            
+  struct queue_t *q;
+  uint32_t index;                                                                                      
+} hnode_t;
+
+typedef struct ihashtable_t{                                                                          
+  hnode_t *firstnode;                                                                               
+  int hsize;                                                                                         
+} ihashtable_t;                                                                                       
+                    
 /*
  * SuperFastHash() -- produces a number between 0 and the tablesize-1.
  *
@@ -26,7 +36,7 @@
 static uint32_t SuperFastHash (const char *data,int len,uint32_t tablesize) {
   uint32_t hash = len, tmp;
   int rem;
-
+	
   if (len <= 0 || data == NULL)
 		return 0;
   rem = len & 3;
@@ -64,16 +74,15 @@ static uint32_t SuperFastHash (const char *data,int len,uint32_t tablesize) {
   return hash % tablesize;
 }
 
-static kvnode_t* create_hnode(void){
-	kvnode_t *kv;
-	if (!(kv=(kvnode_t*)malloc(sizeof(kvnode_t)))){
+static hnode_t* create_hnode(uint32_t index){
+	hnode_t *kv;
+	if (!(kv=(hnode_t*)malloc(sizeof(hnode_t)))){
     printf("[Error : no memory was allocated to hash table nodes]\n");
     return NULL;
   }
- kv->q=NULL;
- kv->key=NULL;
- kv->down=NULL;
- return kv;
+	kv->q=qopen();
+  kv->index=index;
+  return kv;
 }
 
 //function to use in happly
@@ -84,125 +93,133 @@ static kvnode_t* create_hnode(void){
 //}
 //opening a hash table with initial size hsize
 hashtable_t *hopen(uint32_t hsize){
-    hashtable_t *htp;
-    if(!(htp=malloc(sizeof(hashtable_t)))){
-    printf("[Error:no memory was allocated to the table\n");
+	ihashtable_t *htp;
+	if(!(htp=malloc(sizeof(ihashtable_t)))){
+		printf("[Error:no memory was allocated to the table\n");
     return NULL;
-    }
-    htp->hsize=hsize;
-    htp->first=NULL;
-	return htp;
-
+	}
+	for (uint32_t i=0 ; i < hsize: i++){
+		create_hnode(i);
+	}
+	htp->hsize=hsize;
+	return (hashtable*) htp;	
 }
 
 ///* hclose -- closes a hash table */
-  void hclose(hashtable_t *htp){
-	free (htp);
-
-//	free(htp);
-//	htp = NULL;
-
+void hclose(hashtable_t *htp){
+	 for (uint32_t i=0 ; i < hsize: i++){                                                             
+		 free(htp[]);   
+	hnode_t *p=htp->firstnode;
+  hnode_t *s= NULL;
+  while (p!=NULL){
+		s=p->next;
+		qclose(p->q);
+		free(p->ke
+		
+	//	free(htp);
+	//	htp = NULL;
+	
 }
 
 
 //
 ///* hput -- puts an entry into a hash table under designated key                 * returns 0 for success; non-zero otherwise                                    */
 int32_t hput(hashtable_t *htp, void *ep, const char *key, int keylen){
-    int value=0;
-    if (htp != NULL && key != NULL && ep != NULL){
-    //geeting the hash index
-       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
-       kvnode_t *hnode=create_hnode();
-       kvnode_t *prev;
-       if (htp->first==NULL){
-            queue_t *qp = qopen();
-            qput(qp,ep);
-            hnode->q=qp;
-            hnode->key=hash_index;
-            htp->first=hnode;
-       }else{
-           for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
-                if (hnode->key==hash_index){
-                    if (hnode->q == NULL){
-                        queue_t *qp = qopen();
-                        qput(qp,ep);
-                        hnode->q=qp;
-                        hnode->key=hash_index;
-                        if (prev->key < hnode->key){
-                             prev->down=hnode;
-                            }else{
-                             hnode->down=prev;
-                            }
-                        if (htp->first->key>hnode->key){
-                           hnode->down=htp->first;
-                           htp->first=hnode;
-                        }
-                    }else{
-                      qput(hnode->q,ep);
-                    }
-                    break;
-                }
-                prev=hnode;
-            }
-        }
-}
-return value; //0 if successfull
+
+	int value=0;
+	if (htp != NULL && key != NULL && ep != NULL){
+		//geeting the hash index
+		int32_t hash_index  = SuperFastHash ( key, keylen, htp->hsize);  //return ht%size
+		kvnode_t *hnode=create_hnode();
+		kvnode_t *prev;
+		if (htp->first==NULL){
+			queue_t *qp = qopen();
+			qput(qp,ep);
+			hnode->q=qp;
+			hnode->key=hash_index;
+			htp->first=hnode;
+			}else{
+			for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
+					if (hnode->key==hash_index){
+						if (hnode->q == NULL){
+							queue_t *qp = qopen();
+							qput(qp,ep);
+							hnode->q=qp;
+							hnode->key=hash_index;
+							if (prev->key < hnode->key){
+								prev->down=hnode;
+							}else{
+								hnode->down=prev;
+							}
+							if (htp->first->key>hnode->key){
+								hnode->down=htp->first;
+								htp->first=hnode;
+							}
+						}else{
+							qput(hnode->q,ep);
+						}
+						break;
+					}
+					prev=hnode;
+				}
+			}
+		}
+	
+		return value; //0 if successfull
 }
 /* happly -- applies a function to every entry in hash table */
 void happly(hashtable_t *htp, void (*fn)(void* ep)){
-       printf("entered here 0");
-       kvnode_t *hnode;
-       for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
-                if (hnode->q != NULL){
-                    qapply(hnode->q,fn);
-                }
-        }
+	printf("entered here 0\n");
+	kvnode_t *hnode;
+	for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
+		if (hnode->q != NULL){
+			qapply(hnode->q,fn);
+		}
+	}
+	
+}
 
-    }
-
-   /* hsearch -- searchs for an entry under a designated key using a
- * designated search fn -- returns a pointer to the entry or NULL if
+/* hsearch -- searchs for an entry under a designated key using a
+ * designated search fn -- returns a pointer to the entry or null if
  * not found
  */
 void *hsearch(hashtable_t *htp, bool (*searchfn)(void* elementp, const void* searchkeyp),const char *key, int32_t keylen){
+	
+	int32_t hash_index  = SuperFastHash ( key, keylen, htp->hsize); 
+	kvnode_t *hnode;
+	for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
 
-       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
-       kvnode_t *hnode;
-       for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
-
-            if (hnode->key==hash_index){
-                if (hnode->q == NULL){
-                  printf("Element not found");
-                  return NULL;
-                }else{
-                return qsearch(hnode->q, searchfn, key);
-                }
-            }
-        }
-       printf("Found element to hashmap %d \n",hash_index);
-return NULL;
+		if (hnode->key==hash_index){
+			if (hnode->q != NULL){
+				
+				return qsearch(hnode->q, searchfn, key);
+			} 
+		}
+	}
+	printf("Not Found element to hashmap %d \n",hash_index);
+	return NULL;
 }
 /* hremove -- removes and returns an entry under a designated key
  * using a designated search fn -- returns a pointer to the entry or
  * NULL if not found
  */
 void *hremove(hashtable_t *htp,bool (*searchfn)(void* elementp, const void* searchkeyp),const char *key, int32_t keylen){
-       int32_t hash_index  = SuperFastHash (htp,  key, keylen);  //return ht%size
-       kvnode_t *hnode;
-       for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
-            if (hnode->key==hash_index){
-                if (hnode->q == NULL){
-                  printf("Element not found");
-                  return NULL;
-                }else{
-                person_t *person=(person_t*)qremove(hnode->q,searchfn,key);
-                  return person;
-                }
-            }
-        }
-       printf("Found element to hashmap %d \n",hash_index);
-
-return NULL;
+	int32_t hash_index  = SuperFastHash (key, keylen, htp->hsize);  //return ht%size
+	kvnode_t *hnode;
+	for (hnode=htp->first; hnode->key !=MAXREG-1; hnode=hnode->down){
+		if (hnode->key==hash_index){
+			if (hnode->q == NULL){
+				printf("Element not found");
+				return NULL;
+			}else{
+				person_t *person=(person_t*)qremove(hnode->q,searchfn,key);
+				return person;
+			}
+		}
+	}
+	printf("Found element to hashmap %d \n",hash_index);
+	
+	return NULL;
 }
 
 
