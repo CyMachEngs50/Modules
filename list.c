@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
-
+#include <string.h>
 /*allocating memory to the list */
 static car_t *front=NULL;
 
@@ -20,13 +20,13 @@ static car_t *front=NULL;
  * returns 0 if successful; nonzero otherwise
  */
 int32_t lput(car_t *car_pointer){
-    if (front==NULL){
-	   front=car_pointer;
-	}else{
-     car_pointer->next=front->next;
-	 front->next=car_pointer;
+	if (front==NULL){
+		front=car_pointer;
 	}
-	printf("put something!\n");
+	else{
+		car_pointer->next=front->next;
+		front->next=car_pointer;
+	}
 	return 0;
 }
 

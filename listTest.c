@@ -40,9 +40,6 @@ int main(void){
 	car2=create_car("kab", 200000.00, 2003);
 	car3=create_car("kac", 1000000.00, 2015);
 
-
-
-
 	lput(car1);
 	printf("put car1!\n");
 	lput(car2);
@@ -50,13 +47,12 @@ int main(void){
 	lput(car3);
 	printf("put car3!\n");
 	car_t *car=lremove("kac");
-//	car_t *car=lget();
 	printf("Returned car plate : %s\n",car->plate);
 
 	lapply(&myfunc);
     car_t *cart1=lremove("kac");
     if (cart1 !=NULL){
-        printf("Removed car plate %s price : %lf",cart1->plate,cart1->price);
+        printf("Removed car plate %s price : %lf\n",cart1->plate,cart1->price);
     }else{
       printf("not removed..\n");
     }

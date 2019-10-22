@@ -14,12 +14,15 @@
 #include <stdlib.h>
 #define MAXREG 10
 
-
 typedef struct person {
 	char name [MAXREG];
 	int age;
 	double rate;
 } person_t;
+
+void double_rate(person_t* person){                                                                     
+  person->rate= 2*person->rate;                                                                            
+}
 
 bool search(person_t *p, const char keyp[MAXREG]){
   if (strcmp(p->name, keyp)==0){                                                
@@ -40,20 +43,55 @@ person_t* make_person(char* namep, int agep, double ratep){
 }
 
 int main (void){
-	queue_t *qp;
-	person_t *p1,*p2,*p3,*p4,*p5;
-  bool (*fn)(void* elementp, const void* keyp);
-	fn= search;
-	p1=make_person("Greg", 21, 20.0);
-	p2=make_person("Bob", 21, 20.0);
+	person_t *qp;
+	person_t *Greg,*Bob, *person, *Graham, *Cynthia;
+  //bool fn = bool (*fn)(void* elementp, const void* keyp);
+	//fn= (bool*) search;
+	Greg=make_person("Greg", 21, 20.0);
+	Bob=make_person("Bob", 21, 20.0);
+	Graham=make_person("Graham", 20, 40.0);
+	Cynthia=make_person("Cynthia", 19, 50.0); 
 	
 	qp=qopen();
-	p3=(person_t*)qget(qp);
-	p3=(person_t*)qremove(qp, fn, "Greg");
-	qput(qp,(void*)p1);
-	qput(qp,(void*)p2);
-	p5=(person_t*)qsearch(qp, fn, "Bob");
-	p4=(person_t*)qremove(qp, fn, "Greg");
-	p1=(person_t*)qget(qp);
-	qclose(qp);
+	person=(person_t*)qget(qp);   // get from empty queue.
+	if (person ==NULL){
+		printf("cannot get from empty list.\n");
+	}		
+	person=(person_t*)qremove(qp, (void*)search, "Greg");
+	if (person ==NULL){                                                                                          
+    printf("cannot remove from empty list.\n");                                                              }
+	else { printf("got from front of queue: %s\n", person->name);}
+	qput(qp,(void*)Greg);  // put to empty queue
+	qput(qp,(void*)Bob);  // put to a non empty queue
+	person=(person_t*)qsearch(qp, (void*)search, "Bob");  // search for element.
+	if (person != NULL){
+		printf("found %s\n", person->name);
+	}
+	else {
+		printf("found no one with name Bob\n");
+	}
+	person=(person_t*)qremove(qp,(void*) search, "Greg");  // remove from queue.
+	if  (person != NULL){
+		printf("removed %s\n", person->name);
+	}
+	else{
+		printf("no one called Greg to remove");
+	}
+	person=(person_t*)qget(qp);   // get from queue
+	if (person ==NULL){                                                                                     
+    printf("cannot get from empty list.\n");                                                               
+  }
+	else{
+		printf("got from front of queue: %s\n", person->name);
+	}
+	qput(qp,(void*) Graham); 
+	qapply(qp,(void*) double_rate);  // apply a function.
+	person=(person_t*)qsearch(qp,(void*) search, "Graham");
+	if (person != NULL){
+		printf("found %s rate: %f \n", person->name, person->rate);
+	}
+  else {
+		printf("found no one with name Graham\n");
+	}     
+	qclose(qp); //close queue.
 }
